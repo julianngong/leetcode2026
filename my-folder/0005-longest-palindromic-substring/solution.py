@@ -1,33 +1,16 @@
-class Solution(object):
+class Solution:
+    def palindrome(self,s,l,r):
+        templongest = '';
+        while ((l>=0) and (r< len(s)) and (s[l] == s[r])):
+            l -= 1
+            r += 1
+        return(s[l+1:r])
+    
     def longestPalindrome(self, s):
-        currentmax = ''
-        for i in range (len(s)):
-            j = 1
-            tempmax = s[i]
-            while ((i-j>=0) and (i+j < len(s))):
-                if (s[i-j] == s[i+j]):
-                    tempmax = s[i-j] + tempmax + s[i+j]
-                    j += 1
-                else:
-                    j = len(s)
-            if (len(tempmax) > len(currentmax)):
-                currentmax = tempmax
-            if (i+1<len(s)):
-                if (s[i] == s[i+1]):
-                    j = 1
-                    tempmax = s[i] + s[i+1]
-                    while ((i-j>=0) and (i+1+j< len(s))):
-                        if (s[i-j] == s[i+1+j]):
-                            tempmax = s[i-j] + tempmax + s[i+1+j]
-                            j += 1
-                        else:
-                            j = len(s)
-                    if (len(tempmax) > len(currentmax)):
-                        currentmax = tempmax
-        return(currentmax)
-                   
-                   
-                   
-                
-        
+        longest = ''
+        for i in range(len(s)):
+            longestodd = self.palindrome(s,i,i)
+            longesteven = self.palindrome(s,i,i+1)
+            longest = max([longest,longestodd,longesteven], key=len)
+        return(longest)
         
