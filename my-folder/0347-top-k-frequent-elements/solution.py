@@ -1,41 +1,21 @@
-from collections import defaultdict
-import heapq
-
 class Solution:
-    def topKFrequent2(self, nums: List[int], k: int) -> List[int]:
-        total = []
-        output = []
-        if len(nums) == 1:
-            return([nums[0]])
-        else:
-            nums = sorted(nums)
-            count = defaultdict(int)
-            initial = nums[0]
-            count[initial] += 1
-            for i in range(1,len(nums)):
-                if nums[i] != nums[i-1]:
-                    total.append((nums[i-1],count[nums[i-1]]))
-                    initial = nums[i]
-                count[initial]+=1
-            total.append((nums[i],count[nums[i]]))
-            total = sorted(total, key=lambda x: x[1],reverse = True)
-            for i in range(k):
-                output.append(total[i][0])
-            return(output)
-    
     def topKFrequent(self, nums: List[int], k: int) -> List[int]:
-        count = defaultdict(int)
+        seen = {}
+        res = []
+        freq = [[] for i in range(len(nums) + 1)]
         for num in nums:
-            count[num]+=1
-        max_heap = []  # Create a max heap
-
-        for num, freq in count.items():
-            # Push (negative frequency, number) into the max heap
-            heapq.heappush(max_heap, (freq, num))
-            if len(max_heap) > k:
-                heapq.heappop(max_heap)
-        result = [num for _, num in max_heap]
-        return(result)
-
-
+            if num in seen:
+                seen[num] += 1
+            else:
+                seen[num] = 1
         
+        for num, cnt in seen.items():
+            freq[cnt].append(num)
+        
+        for i in range(len(freq) - 1, 0, -1):
+            for num in freq[i]:
+                res.append(num)
+                if len(res) == k:
+                    return res
+
+# before you try to use a sorted list really justify in your head if you need to sort. just becuase they want a specific nlogn solution doesnt mean it involves sorting. All solutions involve a frequency map first. For top frequent elements think about making these frequency maps first.
