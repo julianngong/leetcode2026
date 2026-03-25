@@ -1,14 +1,21 @@
-class Solution(object):
-    def isValid(self, s):
-        pairs = {"[":"]", "{":"}", "(":")"}
-        stack = ''
-        for i in range (len(s)):
-            stack += s[i]
-            if (len(stack) > 1):
-                if (stack[len(stack)-1] == pairs.get(stack[len(stack)-2])):
-                    stack = stack[:-2]
-        if (len(stack) == 0):
-            return True
-        else:
-            return False
-        
+from collections import deque
+class Solution:
+    def isValid(self, s: str) -> bool:
+        stack = deque()
+        close_to_open = {
+            ")":"(",
+            "}":"{",
+            "]":"["
+            }
+        open_symbols = set(["(", "{", "["])
+        for char in s:
+            if char in open_symbols:
+                stack.append(char)
+            else:
+                if len(stack) > 0:
+                    popped = stack.pop()
+                else:
+                    return False
+                if close_to_open[char] != popped:
+                    return False
+        return True if len(stack) == 0 else False
