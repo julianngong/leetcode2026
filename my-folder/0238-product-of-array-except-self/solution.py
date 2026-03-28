@@ -90,3 +90,19 @@ class Solution:
             postfix *= nums[j]
             
         return res
+    
+    def productExceptSelf2ndGo(self, nums: List[int]) -> List[int]:
+        storage = [1] * len(nums)
+        current = 1
+        for i, num in enumerate(nums):
+            if i > 0: # dont need the if statement if you set storage[i] first
+                current *= nums[i-1]
+            storage[i] = current
+        current = 1
+        for i in range(len(nums)-1,-1,-1):
+            if i<len(nums)-1:
+                current *= nums[i+1]
+            storage[i] *= current
+        return(storage)
+    
+    # absolutely smashed it second time mate. only thing to note when doing the reverse forloop, remember that the middle number it never actually hits it it hits the iteration loop just before the number so to go down to 0 need to use -1's everywhere
