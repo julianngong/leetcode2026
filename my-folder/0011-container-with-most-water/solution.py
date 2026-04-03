@@ -48,3 +48,17 @@ class Solution:
                 rp -= 1
                 
         return maxarea
+
+    def maxAreaTry2(self, heights: List[int]) -> int:
+        i = 0
+        j = len(heights)-1
+        res = 0
+        while i<j:
+            area = (j-i) * min(heights[i], heights[j])
+            if area>res:
+                res = area
+            if heights[i] > heights[j]:
+                j -=1
+            else:
+                i +=1
+        return res
