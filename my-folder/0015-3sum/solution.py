@@ -1,3 +1,5 @@
+from collections import Counter
+
 class Solution:
     # =========================================================================
     # My Thought Process / Notes:
@@ -122,4 +124,100 @@ class Solution:
                         
         return res
 
+    """
+    Notes: 3Sum (Dictionary/Counter Approach)
+
+    General Rule of Thumb: Whenever a problem asks you to find unique combinations 
+    and specifically says "avoid duplicates," your first instinct should be to sort 
+    the array. Sorting groups duplicates together, making them easy to skip.
+
+    The Strategy: 
+    I nearly did this right on the first try for the dictionary approach. The idea 
+    is to fix the first two numbers (nums[i] and nums[j]) and use a Counter to instantly 
+    look up if the required third number (target = -twosum) exists.
+
+    Handling Duplicates:
+    Because the list is sorted, we can easily avoid duplicate triplets. If our current `i` 
+    or `j` is the exact same number as the previous `i` or `j`, we just skip it using `continue`. 
+
+    Managing the Counter (The tricky part):
+    1. We decrement `seen[nums[i]]` and `seen[nums[j]]` as we iterate so we don't accidentally 
+    reuse the exact same element to form our target.
+    2. After checking all possible `j`'s for a specific `i`, we have to restore the counts 
+    for the `j` loop so the next `i` can use those numbers.
+    3. Crucial note: You DON'T need to increment/restore `seen[nums[i]]`. Once we finish an `i` 
+    loop, we are completely done using that specific number as a starting point, so we just 
+    leave it decremented and move on.
+    """
+
+    def threeSumTry2(self, nums: List[int]) -> List[List[int]]:
+        nums = sorted(nums) # Sort first to easily skip duplicates later
+        seen = Counter(nums)
+        res = []
+        
+        for i in range(len(nums) - 1):
+            # Remove nums[i] from available pool
+            seen[nums[i]] -= 1
             
+            # Skip duplicate 'i' values to avoid duplicate triplets
+            if i > 0 and nums[i] == nums[i-1]:
+                continue
+
+            for j in range(i + 1, len(nums)):
+                # Remove nums[j] from available pool
+                seen[nums[j]] -= 1
+                
+                # Skip duplicate 'j' values (make sure we don't check j against i)
+                if j - 1 > i and nums[j] == nums[j-1]:
+                    continue
+                    
+                twosum = nums[i] + nums[j]
+                target = -twosum
+                
+                # If the required 3rd number is still available in our pool, we found a match
+                if seen[target] > 0:
+                    res.append([nums[i], nums[j], target])
+            
+            # Restore the pool for the next 'i' iteration
+            # Note: We ONLY restore the 'j' values. We do NOT restore seen[nums[i]] 
+            # because we are permanently done searching with this 'i'.
+            for j in range(i + 1, len(nums)):
+                seen[nums[j]] += 1
+                
+        return res
+    """
+    # 2. Why MUST I skip duplicates for `sp`?
+    Once we find a valid triplet that equals 0, we increment `sp` and decrement `ep`. 
+    But if the *new* `sp` is the exact same number as the old `sp`, the two-pointer logic 
+    will eventually just find the exact same triplet again. To guarantee unique combos, 
+    we have to keep pushing `sp` forward until it sits on a brand-new number.
+
+    3. Why DON'T I need a `while` loop to skip duplicates for `ep`?
+    Because the math naturally takes care of it for us! If we force `sp` to move to a 
+    *new, unique* number, the required value to reach 0 completely changes. If `ep` happens 
+    to be sitting on a duplicate of its previous value, the sum will simply be too big 
+    or too small, and the normal `elif total > 0` or `elif total < 0` logic will naturally 
+    push `ep` along on the next iteration. Skipping duplicates on just *one* of the two 
+    pointers (usually the left one) is enough to break the cycle.
+    """
+    def threeSumTry2Pointer(self, nums: List[int]) -> List[List[int]]:
+        res = []
+        nums = sorted(nums)
+        for i in range(len(nums)):
+            if i and nums[i] == nums[i-1]:
+                continue
+            sp = i+1
+            ep = len(nums)-1
+            while sp < ep:
+                total = nums[i] + nums[sp] + nums[ep]
+                if total > 0:
+                    ep -= 1
+                elif total < 0:
+                    sp += 1
+                else:
+                    res.append([nums[i], nums[sp], nums[ep]])
+                    ep -= 1
+                    sp += 1
+                    while nums[sp] == nums[sp-1] and sp < ep:
+                        sp += 1
+        return res
