@@ -28,3 +28,38 @@ class Solution:
             charset.add(s[r])
             res = max(res, r-l+1)
         return res
+    
+    """
+    Notes: Longest Substring (Analyzing the 2nd Attempt)
+
+    What went wrong in Try 2:
+    I tried to be clever by initializing the set with every unique character in the string 
+    (`set(s)`) right at the start. This forced me into a really weird tracking situation. 
+    Instead of tracking what was *currently* in my window, I was trying to work backwards—
+    removing letters as I saw them and then confusingly re-adding them with the left pointer. 
+    The pointer logic (incrementing `r` in the `if`, but `l` in the `else`) got completely 
+    tangled and is much harder to trace.
+
+    The Lesson for Next Time (Stick to Attempt 1):
+    1. Start Empty: Always start with an EMPTY character set. Build it up as you go. 
+    The set's only job is to reflect the exact characters currently sitting between 
+    your left and right pointers.
+    2. The Golden Loop Structure: Don't use a single `while` loop trying to juggle both 
+    pointers at once. Use a `for` loop to relentlessly push the right pointer forward 
+    (evaluating each new letter), and put a `while` loop inside it to shift the left 
+    slider up only when the window becomes invalid. Keep repeating the left shift 
+    until the duplicate is gone.
+    """
+    def lengthOfLongestSubstringTry2(self, s: str) -> int:
+        charset = set(s)
+        l,r = 0,0
+        res = 0
+        while r<len(s):
+            if s[r] in charset:
+                res = max(res, r-l+1)
+                charset.remove(s[r])
+                r+=1
+            else:
+                charset.add(s[l])
+                l+=1
+        return res
