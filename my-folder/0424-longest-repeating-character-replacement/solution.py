@@ -73,3 +73,54 @@ class Solution:
             max_window = max(max_window, window)
             
         return max_window
+    
+    def characterReplacementTry2(self, s: str, k: int) -> int:
+        res = 0
+        l = 0
+        counts = defaultdict(int)
+        for r in range(len(s)):
+            counts[s[r]] += 1
+            maxcount = max(counts.values())
+            numchars = r-l+1 
+            if numchars - maxcount <= k:
+                res = max(res, r-l+1)
+            else:
+                while numchars - maxcount > k:
+                    counts[s[l]] -= 1
+                    l += 1
+                    maxcount = max(counts.values())
+                    numchars = r-l+1 
+        return res
+
+    """
+    MY REFLECTION & OPTIMIZATION NOTES:
+    
+    1. Try 2 Mistake: I calculated `maxcount` and `numchars` *before* adjusting counts. They used the same `l` and `r` that triggered the loop, so they never changed!
+    
+    2. The O(26*N) Inefficiency: Calling `max(counts.values())` scans all 26 letters every single time we move the pointers.
+    
+    3. The O(N) Trick (`maxf`): Just track the historical max frequency instead (`maxf = max(maxf, counts[s[r]])`). 
+    
+    4. Why it works: When we shrink the window, we don't lower `maxf` even if the actual max drops. Why? We only care about finding a *larger* result, which mathematically requires beating our historical `maxf` anyway. A "stale", high `maxf` just safely bottlenecks the window size until we find a character that actually beats it!
+    """
+
+    def characterReplacement(self, s: str, k: int) -> int:
+        res = 0
+        l = 0
+        counts = defaultdict(int)
+        maxf = 0
+        
+        for r in range(len(s)):
+            counts[s[r]] += 1
+            maxf = max(maxf, counts[s[r]]) # Only check against historical max
+            numchars = r-l+1 
+            
+            if numchars - maxf <= k:
+                res = max(res, r-l+1)
+            else:
+                while numchars - maxf > k:
+                    counts[s[l]] -= 1
+                    l += 1
+                    numchars = r-l+1 
+                    
+        return res
