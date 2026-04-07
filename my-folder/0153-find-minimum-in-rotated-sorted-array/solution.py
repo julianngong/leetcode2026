@@ -28,7 +28,7 @@ class Solution:
     # ==========================================
     # Such a hard question, but here is the trick: The rotated array only goes in one direction. 
     # We are looking for the "inflection point" (the cliff where numbers drop from high to low).
-    def findMin(self, nums: List[int]) -> int:
+    def findMinOptimal(self, nums: List[int]) -> int:
         # We assume the smallest value is the first number to start, but this will update.
         res = nums[0]
         
@@ -70,5 +70,80 @@ class Solution:
                 r = mp - 1
                 
         return res
+    
+    # ---------------------------------------------------------
+    # ATTEMPT 1 & 2: THE "LEFT SIDE" PITFALL
+    # ---------------------------------------------------------
+    def findMinTry2(self, nums: List[int]) -> int:
+        l,r = 0, len(nums)-1
+        while l<r:
+            mid = (l+r)//2
+            print("l", l, "val", nums[l])
+            print("r", r, "val", nums[r])
+            print("mp", mid, "val", nums[mid])
+            print(nums)
+            
+            if nums[l] <= nums[r]:
+                return nums[l]
+            if nums[l] < nums[mid]:
+                l = mid+1
+            else:
+                r = mid-1
+                
+    # ---------------------------------------------------------
+    # OPTIMAL SOLUTION
+    # ---------------------------------------------------------
+    """
+    MY REFLECTION & ALGORITHM NOTES:
+
+    1. The "Left Side" Pitfall:
+    I made the classic mistake at first: checking the left side (`nums[l] < nums[mid]`). 
+    The issue with looking at the left is ambiguity. Even if the left side is perfectly 
+    sorted, the absolute minimum could be on the left OR the right. Relying on the left 
+    forces you to write messy edge cases to figure out where you are.
+
+    2. The "Right Side" Anchor:
+    For finding a minimum, we must ONLY check the right side: `nums[mid] < nums[r]`. 
+    The right side deterministically tells us exactly where the "cliff" (the drop-off) is.
+
+    3. Why `r = mid` vs `l = mid + 1`:
+    * If `nums[mid] < nums[r]`: The right side is a normal upward slope. The cliff isn't 
+      over there. However, `mid` itself might literally be the minimum (the bottom of the 
+      cliff), so we CANNOT throw it away. We keep it in our search space by setting `r = mid`.
+    * If `nums[mid] > nums[r]`: The cliff is between `mid` and `r`. Because `mid` is strictly 
+      larger than `r`, we know mathematically that `mid` CANNOT be the minimum. Since it's a 
+      guaranteed loser, we safely step right over it by setting `l = mid + 1`.
+
+    4. The Final Answer:
+    Because of how we squeeze the bounds, the loop breaks exactly when `l` and `r` crash 
+    into each other (`l == r`). That single surviving number is guaranteed to be the minimum.
+
+    5. Finding a Target vs. Finding a Shape:
+    Why does this differ from the standard "Search in Rotated Array" problem? 
+    * When searching for a TARGET (a specific number), you need predictability. You use the 
+      left side to find the "sorted" half, check if your target lives inside that sorted 
+      range, and decide which way to go. 
+    * When searching for a SHAPE (the minimum), you don't care about specific numbers or 
+      bounds. You just need the right-hand anchor to definitively point you toward the cliff.
+    """
+    
+    def findMin(self, nums: List[int]) -> int:
+        l, r = 0, len(nums) - 1
+        
+        while l < r:
+            mid = (l + r) // 2
+            
+            if nums[mid] < nums[r]:
+                # Mid might be the minimum, so keep it!
+                r = mid
+            else:
+                # Mid is definitely NOT the minimum, step over it!
+                l = mid + 1
+                
+        # l and r have converged on the exact minimum
+        return nums[l]
+
+
+
     
 
