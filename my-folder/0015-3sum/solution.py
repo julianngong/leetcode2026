@@ -221,3 +221,73 @@ class Solution:
                     while nums[sp] == nums[sp-1] and sp < ep:
                         sp += 1
         return res
+
+    """
+    MY THOUGHT PROCESS & NOTES:
+
+    1. First thing: I remembered the need for sorting! 
+       This is the key to the whole problem because we need to easily skip duplicates.
+       - Bonus realization here: Because it's sorted, if the first pointer `a` lands on a 
+         number > 0, every number after it is also strictly positive. You can never add 
+         positive numbers together to get 0, so we can just `break` and finish early!
+
+    2. Next up, avoiding duplicate starting numbers (`a`): 
+       We are allowed to use the same number twice in a single answer, but we don't want 
+       to evaluate the exact same starting number twice for different answers. So, I look 
+       behind: if `i > 0` and it matches the previous value, I `continue` and skip it to 
+       make sure there is no double counting.
+
+    3. Now inside the loop (The Sliding Window): 
+       I remembered this is a two-pointer problem, not another for-loop! I set `j` to 
+       the start (`i + 1`) and `k` to the end. I calculate the sum: if it's too big 
+       (> 0), I move `k` inwards. If it's too small (< 0), I move `j` inwards.
+
+    4. The tricky part (When sum == 0): 
+       The hard thing to remember is what to do when we actually find a match. We add 
+       it to our results, but then we want to move BOTH pointers. 
+       - Why? We definitely want to move `j` inwards to find new combinations. But if 
+         we move to a completely new `j`, the total sum changes. That means whatever 
+         our current `k` is will NEVER be the right `k` to make the sum work again. 
+         Since that `k` is now completely useless to us, we can safely move it inwards 
+         too (`k -= 1`).
+
+    5. The final clean-up: 
+       After moving `j` on a match, I have a quick `while` loop that ensures `j` actually 
+       moved to a brand new number and didn't just step onto a duplicate of itself.
+    """
+
+    def threeSumTry3(self, nums: List[int]) -> List[List[int]]:
+        res = []
+        nums.sort()
+
+        for i, a in enumerate(nums):
+            # 1. Early exit if 'a' is positive
+            if a > 0:
+                break
+            
+            # 2. Skip duplicate starting numbers
+            if i > 0 and a == nums[i - 1]:
+                continue
+            
+            # 3. Setup sliding window
+            j = i + 1
+            k = len(nums) - 1
+            
+            while j < k:
+                threesum = a + nums[j] + nums[k]
+                
+                if threesum > 0:
+                    k -= 1
+                elif threesum < 0:
+                    j += 1
+                else:
+                    # 4. Match found! Move both pointers.
+                    res.append([a, nums[j], nums[k]])
+                    j += 1
+                    k -= 1
+                    
+                    # 5. Ensure the new 'j' isn't a duplicate
+                    while nums[j] == nums[j - 1] and j < k:
+                        j += 1
+                        
+        return res
