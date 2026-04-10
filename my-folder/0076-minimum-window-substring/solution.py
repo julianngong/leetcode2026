@@ -79,3 +79,28 @@ class Solution:
                 
         l, r = res
         return s[l : r + 1] if resLen != float("infinity") else ""
+
+    def minWindowTry2(self, s: str, t: str) -> str:
+        t_count = Counter(t)
+        window_count = Counter()
+        l = 0
+        need = len(t_count)
+        have = 0
+        res = ""
+        for r in range(len(s)):
+            window_count[s[r]] += 1
+            if s[r] in t_count and window_count[s[r]] == t_count[s[r]]:
+                have += 1
+            while have == need:
+                if res == "":
+                    res = s[l:r+1]
+                elif r-l+1 < len(res):
+                    res = s[l:r+1]
+                window_count[s[l]] -= 1
+                if s[l] in t_count and window_count[s[l]] < t_count[s[l]]:
+                    have -= 1
+                l += 1
+        return res
+
+# you did this first time mate so so so so good. only other thing to note is you are still using slicing a list here in a loop which we know makes brand new one each time. for efficienct just store a list of 2 which represents left and right pointer and be storing that then only return the slice at the end once we have the solution.
+
