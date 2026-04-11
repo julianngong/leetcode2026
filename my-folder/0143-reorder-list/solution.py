@@ -5,7 +5,7 @@
 #         self.next = next
 
 class Solution:
-    def reorderList(self, head: Optional[ListNode]) -> None:
+    def reorderListFirstAttempt(self, head: Optional[ListNode]) -> None:
         """
         Do not return anything, modify head in-place instead.
         
@@ -61,3 +61,61 @@ class Solution:
             # Move our pointer variables forward down the list
             first = temp1
             second = temp2
+
+    def reorderList(self, head: Optional[ListNode]) -> None:
+        """
+        --- CRITICAL NOTE FOR NEXT TIME ---
+        
+        1. THE "SEVERING" REQUIREMENT (The Missing slow.next = None):
+           If you don't detach the first half from the second half, you create 
+           a 'Cycle' or Infinite Loop. 
+           
+           THE ISSUE: When you reverse the second half, those nodes now point 
+           backwards. If the tail of your first half still points to the 
+           original start of the second half, the merge phase will eventually 
+           link a node to a previous node in the sequence, creating a circle 
+           that the computer will follow forever until the memory or time 
+           limit expires.
+           
+        2. DITCHING THE DUMMY:
+           You don't actually need a dummy node to find the middle. Using 
+           'slow, fast = head, head.next' is more efficient. 
+           
+        3. WHY IT WORKS FOR SINGLE NODES (N=1):
+           If the list has only one node, 'fast' (head.next) is None. The 
+           'while fast and fast.next' loop never runs. 'halfstart' becomes 
+           None, 'slow.next' remains None, and the merge loop 'while second' 
+           never starts. The code stays robust without extra 'if' checks.
+        """
+        if not head or not head.next:
+            return
+
+        # 1. Find the middle (No dummy needed)
+        slow, fast = head, head.next
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+        
+        # 2. SEVER THE CONNECTION
+        # This is the "string cutting" that prevents the infinite loop.
+        curr = slow.next
+        slow.next = None 
+        
+        # 3. Reverse the second half
+        prev = None
+        while curr:
+            temp = curr.next
+            curr.next = prev
+            prev = curr
+            curr = temp
+        
+        # 4. Merge the two halves
+        curr1, curr2 = head, prev
+        while curr2: # curr2 is always shorter or equal to curr1
+            temp1, temp2 = curr1.next, curr2.next
+            
+            curr1.next = curr2
+            curr2.next = temp1
+            
+            curr1 = temp1
+            curr2 = temp2
