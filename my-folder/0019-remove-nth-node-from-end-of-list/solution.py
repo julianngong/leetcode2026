@@ -41,7 +41,7 @@ class Solution:
     This perfectly offsets our left pointer by 1 behind the real list. It also helps us later: we can just 
     return dummy.next, which allows the first element to be deleted without breaking everything.
     """
-    def removeNthFromEnd(self, head: Optional[ListNode], n: int) -> Optional[ListNode]:
+    def removeNthFromEndSolution(self, head: Optional[ListNode], n: int) -> Optional[ListNode]:
         dummynode = ListNode()
         dummynode.next = head
         lp = dummynode
@@ -64,3 +64,16 @@ class Solution:
         # Rather than adding annoying if/else logic for when the head is deleted, we just rely on the dummy node.
         # dummynode.next will ALWAYS point to the correct start of the list, even if the original head was destroyed.
         return dummynode.next
+
+    def removeNthFromEnd(self, head: Optional[ListNode], n: int) -> Optional[ListNode]:
+        dummy = ListNode()
+        dummy.next = head
+        front = head
+        prev = dummy
+        for i in range(n-1):
+            front = front.next
+        while front.next:
+            front = front.next
+            prev = prev.next
+        prev.next = prev.next.next
+        return dummy.next
