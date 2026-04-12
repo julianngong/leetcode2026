@@ -104,7 +104,7 @@ class Solution:
     4. Why it works: When we shrink the window, we don't lower `maxf` even if the actual max drops. Why? We only care about finding a *larger* result, which mathematically requires beating our historical `maxf` anyway. A "stale", high `maxf` just safely bottlenecks the window size until we find a character that actually beats it!
     """
 
-    def characterReplacement(self, s: str, k: int) -> int:
+    def characterReplacementSol(self, s: str, k: int) -> int:
         res = 0
         l = 0
         counts = defaultdict(int)
@@ -123,4 +123,18 @@ class Solution:
                     l += 1
                     numchars = r-l+1 
                     
+        return res
+    
+    def characterReplacement(self, s: str, k: int) -> int:
+        windowcount = defaultdict(int)
+        res = 0
+        l = 0
+        maxf = 0
+        for r in range(len(s)):
+            windowcount[s[r]] += 1
+            maxf = max(windowcount[s[r]], maxf)
+            while (r-l+1) - maxf > k:
+                windowcount[s[l]] -= 1
+                l = l+1
+            res = max(res, r-l+1)
         return res
