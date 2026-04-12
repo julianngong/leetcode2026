@@ -64,6 +64,16 @@ class NodeWrapper:
     def __lt__(self, other):
         return self.node.val < other.node.val
 
+class SortableNode:
+    def __init__(self, node: ListNode):
+        self.node = node
+    
+    def __lt__(self, other):
+        return self.node.val < other.node.val
+    
+    def __gt__(self, other):
+        return self.node.val > other.node.val
+
 class Solution:    
     def mergeKListsHeap(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:
         # Early exit for empty list
@@ -139,7 +149,7 @@ class Solution:
         if/else block just to assign a variable.
     """
 
-    def mergeKLists(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:
+    def mergeKListsDivideAndConquer(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:
         # Early exit for empty input
         if not lists or len(lists) == 0:
             return None
@@ -183,4 +193,46 @@ class Solution:
         if l2:
             curr.next = l2
             
-        return dummy.next    
+        return dummy.next  
+
+    def mergeKListsHeap(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:
+        dummy = ListNode()
+        heap = []
+        for node in lists:
+            if node:
+                heapq.heappush(heap, SortableNode(node))
+        curr = dummy
+        while heap:
+            smallest = heapq.heappop(heap)
+            curr.next = smallest.node
+            curr = curr.next
+            if smallest.node.next:
+                heapq.heappush(heap, SortableNode(smallest.node.next))
+        return dummy.next
+    
+    def mergeKLists(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:
+        if len(lists) == 0:
+            return None
+        while len(lists) > 1:
+            newlist = []
+            for i in range(len(lists)//2):
+                front = dummy = ListNode()
+                l1, l2 = lists[i*2], lists[i*2 + 1]
+                while l1 and l2:
+                    if l1.val < l2.val:
+                        dummy.next = l1
+                        l1 = l1.next
+                    else:
+                        dummy.next = l2
+                        l2 = l2.next
+                    dummy = dummy.next
+                if l1:
+                    dummy.next = l1
+                if l2:
+                    dummy.next = l2
+                newlist.append(front.next)
+            if len(lists) % 2 != 0:
+                newlist.append(lists[-1])
+            lists = newlist
+        return lists[0]
+  
