@@ -94,7 +94,7 @@ class Solution:
     # force the right pointer to move anyway because the sum will be off. 
     # =========================================================================
 
-    def threeSum(self, nums: list[int]) -> list[list[int]]:
+    def threeSumIdeal(self, nums: list[int]) -> list[list[int]]:
         # NOTE: Always sort first for Two Pointer array problems!
         nums = sorted(nums)
         res = []
@@ -290,4 +290,27 @@ class Solution:
                     while nums[j] == nums[j - 1] and j < k:
                         j += 1
                         
+        return res
+    
+    # literally a perfect solution, you smashed it mate. well done
+    def threeSum(self, nums: List[int]) -> List[List[int]]:
+        nums = sorted(nums)
+        i = 0
+        res = []
+        for i in range(len(nums)-2):
+            if i>0 and nums[i] == nums[i-1]:
+                continue
+            j = i+1
+            k = len(nums)-1
+            while j<k:
+                if nums[i] + nums[j] + nums[k] > 0:
+                    k -= 1
+                elif nums[i] + nums[j] + nums[k] < 0:
+                    j += 1
+                else:
+                    res.append([nums[i], nums[j], nums[k]])
+                    j += 1
+                    k -= 1
+                    while nums[j] == nums[j-1] and j<k:
+                        j+=1
         return res
