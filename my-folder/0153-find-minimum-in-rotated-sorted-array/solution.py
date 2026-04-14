@@ -74,7 +74,7 @@ class Solution:
     # ---------------------------------------------------------
     # ATTEMPT 1 & 2: THE "LEFT SIDE" PITFALL
     # ---------------------------------------------------------
-    def findMinTry2(self, nums: List[int]) -> int:
+    def findMinfailed(self, nums: List[int]) -> int:
         l,r = 0, len(nums)-1
         while l<r:
             mid = (l+r)//2
@@ -89,6 +89,7 @@ class Solution:
                 l = mid+1
             else:
                 r = mid-1
+                
                 
     # ---------------------------------------------------------
     # OPTIMAL SOLUTION
@@ -127,7 +128,7 @@ class Solution:
       bounds. You just need the right-hand anchor to definitively point you toward the cliff.
     """
     
-    def findMin(self, nums: List[int]) -> int:
+    def findMindwda(self, nums: List[int]) -> int:
         l, r = 0, len(nums) - 1
         
         while l < r:
@@ -141,6 +142,20 @@ class Solution:
                 l = mid + 1
                 
         # l and r have converged on the exact minimum
+        return nums[l]
+
+        
+    # latest solution below
+    def findMin(self, nums: List[int]) -> int:
+        l, r = 0, len(nums)-1
+        while l < r:
+            if nums[l] < nums[r]:
+                return nums[l]
+            mp = (l + r) // 2
+            if nums[l] <= nums[mp]:
+                l = mp + 1
+            else:
+                r = mp
         return nums[l]
 
 
